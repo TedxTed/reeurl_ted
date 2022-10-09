@@ -16,9 +16,10 @@ FactoryBot.define do
   factory :user do
     email 
     password {"password"}
-    
   end
+  
   sequence :email do |n|
     "#{n}-#{Faker::Internet.email}"
   end
+
 end
