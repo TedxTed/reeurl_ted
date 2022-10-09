@@ -1,4 +1,3 @@
-require 'faker'
 
 namespace :link do
   desc '建立初始資料'

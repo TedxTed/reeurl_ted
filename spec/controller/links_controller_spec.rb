@@ -15,6 +15,8 @@ RSpec.describe LinksController, type: :controller do
 
   it '#index ' do
     get :index
+
+    expect(assigns(:links)).to eq(@user.links)
     expect(response).to have_http_status(200)
     expect(response).to render_template(:index)
   end

@@ -1,13 +1,15 @@
 class LinksController < ApplicationController
-  before_action :authenticate_user!, except: [:show]
+  before_action :authenticate_user!, except: [:redirect_to_orginurl]
   require 'zlib'
 
   def index
-    @links = Link.all
+    @domain = ENV.fetch('DOMAIN_SHORT_URL', nil)
+    @current_user = current_user
+    @links = @current_user.links if @current_user
   end
 
   def new
-    @ink = Link.new
+    @link = Link.new
   end
 
   def create
@@ -17,6 +19,10 @@ class LinksController < ApplicationController
     else
       render :new, status: :unprocessable_entity
     end
+  end
+
+  def destroy
+
   end
 
   def redirect_to_orginurl
