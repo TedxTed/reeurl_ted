@@ -16,7 +16,7 @@ class LinksController < ApplicationController
   def create
     @link = current_user.links.new(link_params)
     if @link.save
-      redirect_to '/', notice: 'Link was successfully created.'
+      redirect_to links_url, notice: 'Link was successfully created.'
     else
       render :new, status: :unprocessable_entity
     end
@@ -25,7 +25,6 @@ class LinksController < ApplicationController
   def edit; end
 
   def update
-    p params
     if @link.update(link_params)
       redirect_to links_url, notice: 'Link was successfully updated.'
     else
@@ -35,7 +34,7 @@ class LinksController < ApplicationController
 
   def destroy
     @link = Link.find_by(id: params[:id])
-    if link
+    if @link
       @link.destroy
       redirect_to links_url
     else
@@ -45,7 +44,7 @@ class LinksController < ApplicationController
 
   def redirect_to_orginurl
     slug = params[:slug]
-    orginurl = Link.find_by(slug:)&.orginurl
+    orginurl = Link.find_by(slug: slug)&.orginurl
     if orginurl
       redirect_to orginurl, allow_other_host: true
     else

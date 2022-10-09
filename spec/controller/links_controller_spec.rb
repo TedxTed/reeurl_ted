@@ -39,7 +39,7 @@ RSpec.describe LinksController, type: :controller do
         post :create, params: { link: @link_params }
         expect(response).not_to have_http_status(200)
         expect(response).to have_http_status(302)
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(links_path)
       end
     end
 
@@ -79,7 +79,7 @@ RSpec.describe LinksController, type: :controller do
 
     context 'redirect失敗的狀況' do
       it '到show時非認識的slug要show 404' do
-        get :redirect_to_orginurl, params: { slug: '0000' }
+        get :redirect_to_orginurl, params: { slug: 'A0000' }
 
         expect(response).to have_http_status(404)
         expect(response.body).to match(/doesn't exist/)
