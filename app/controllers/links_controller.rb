@@ -22,7 +22,13 @@ class LinksController < ApplicationController
   end
 
   def destroy
-
+    link = Link.find_by(id: params[:id])
+    if link
+      link.destroy
+      redirect_to links_url
+    else
+      render_404
+    end
   end
 
   def redirect_to_orginurl

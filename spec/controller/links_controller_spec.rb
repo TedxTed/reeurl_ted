@@ -83,8 +83,32 @@ RSpec.describe LinksController, type: :controller do
         get :redirect_to_orginurl, params: { slug: '0000' }
 
         expect(response).to have_http_status(404)
-
         expect(response.body).to match(/doesn't exist/)
+      end
+    end
+  end
+
+  describe '#destroy' do
+    context 'destroy success' do
+      before(:each) do
+        @link = @user.links.first
+      end
+
+      it 'destroy a link' do
+        expect { delete :destroy, params: { id: @link.id } }.to change { Link.all.count }.by(-1)
+      end
+
+      it 'redirect_to index after destroy' do
+        delete :destroy, params: { id: @link.id }
+        expect(response).to have_http_status(302)
+        expect(response).to redirect_to(links_path)
+      end
+    end
+    context 'destroy fail' do
+      it '刪除不存在的link會失敗' do
+        link = @user.links.last
+        delete :destroy, params: { id: link.id + 1 }
+        expect(response).to have_http_status(404)
       end
     end
   end
