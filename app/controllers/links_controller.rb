@@ -1,5 +1,6 @@
 class LinksController < ApplicationController
   before_action :authenticate_user!, except: [:redirect_to_orginurl]
+  before_action :find_link, only: %i[edit update destroy]
   require 'zlib'
 
   def index
@@ -9,11 +10,11 @@ class LinksController < ApplicationController
   end
 
   def new
-    @link = Link.new
+    @link = current_user.links.new
   end
 
   def create
-    @link = Link.new(link_params)
+    @link = current_user.links.new(link_params)
     if @link.save
       redirect_to '/', notice: 'Link was successfully created.'
     else
@@ -21,10 +22,21 @@ class LinksController < ApplicationController
     end
   end
 
+  def edit; end
+
+  def update
+    p params
+    if @link.update(link_params)
+      redirect_to links_url, notice: 'Link was successfully updated.'
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   def destroy
-    link = Link.find_by(id: params[:id])
+    @link = Link.find_by(id: params[:id])
     if link
-      link.destroy
+      @link.destroy
       redirect_to links_url
     else
       render_404
@@ -42,6 +54,10 @@ class LinksController < ApplicationController
   end
 
   private
+
+  def find_link
+    @link = Link.find_by(id: params[:id])
+  end
 
   def link_params
     params.require(:link).permit(:orginurl, :user_id)

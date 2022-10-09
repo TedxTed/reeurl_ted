@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'base64'
 require 'digest/crc32'
 
 RSpec.describe LinksController, type: :controller do
@@ -88,13 +87,44 @@ RSpec.describe LinksController, type: :controller do
     end
   end
 
+  describe '#update' do
+    before(:example) do
+      @link = @user.links.last
+    end
+
+    context 'update成功' do
+      before(:example) do
+        @update_link = {
+          orginurl: "https://unsplash.com/s/photos/#{Faker::Creature::Animal.name}"
+        }
+        put :update, params: { id: @link.id, link: @update_link }
+      end
+      it '成功update每一筆資料' do
+        expect(@user.links.last.orginurl).to eq(@update_link[:orginurl])
+      end
+      it '成功update後的狀態及轉址' do
+        expect(response).to have_http_status(302)
+        expect(response).to redirect_to(links_path)
+      end
+    end
+
+    context 'update失敗' do
+      before(:example) do
+        put :update, params: { id: @link.id, link: { orginurl: '' } }
+      end
+      it 'update失敗' do
+        expect(response).to have_http_status(422)
+      end
+    end
+  end
+
   describe '#destroy' do
     context 'destroy success' do
       before(:each) do
         @link = @user.links.first
       end
 
-      it 'destroy a link' do
+      it '成功刪除一個link' do
         expect { delete :destroy, params: { id: @link.id } }.to change { Link.all.count }.by(-1)
       end
 
@@ -105,9 +135,14 @@ RSpec.describe LinksController, type: :controller do
       end
     end
     context 'destroy fail' do
+      before(:example) do
+        @link = @user.links.last
+      end
       it '刪除不存在的link會失敗' do
-        link = @user.links.last
-        delete :destroy, params: { id: link.id + 1 }
+        expect { delete :destroy, params: { id: @link.id + 1 } }.not_to change { Link.all.count }
+      end
+      it '刪除失敗會轉跳404' do
+        delete :destroy, params: { id: @link.id + 1 }
         expect(response).to have_http_status(404)
       end
     end
